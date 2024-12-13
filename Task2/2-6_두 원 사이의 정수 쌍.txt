@@ -1,0 +1,22 @@
+#include <string>
+#include <vector>
+#include <cmath>
+
+using namespace std;
+
+long long solution(int r1, int r2) {
+    long long answer = 0;
+    
+    for(int i = 1; i <= r2; i++) {
+        long long pitagorasMin = (long long)r1*(long long)r1 - (long long)i*(long long)i;
+        long long pitagorasMax = (long long)r2*(long long)r2 - (long long)i*(long long)i;
+        pitagorasMin = pitagorasMin > 0 ? pitagorasMin : 0;  
+        
+        long long minY = ceil(sqrt(pitagorasMin));
+        long long maxY = floor(sqrt(pitagorasMax));
+        
+        answer += maxY - minY + 1;
+    }
+    
+    return answer * 4;
+}
