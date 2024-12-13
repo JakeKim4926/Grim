@@ -1,0 +1,21 @@
+#include <string>
+#include <vector>
+
+using namespace std;
+
+int solution(int a, int b) {
+    int answer = 0;
+    string str_a = to_string(a);
+    string str_b = to_string(b);
+    
+    string str_aResult = str_a + str_b;
+    string str_bResult = str_b + str_a;
+    
+    int ab = stoi(str_aResult);
+    int ba = stoi(str_bResult);
+    
+    if(ab >= ba)    answer = ab;
+    else            answer = ba;
+    
+    return answer;
+}
