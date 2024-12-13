@@ -1,0 +1,36 @@
+#include <string>
+#include <vector>
+#include <stack>
+
+using namespace std;
+
+int solution(vector<int> ingredient) {
+    int answer = 0;
+    
+    vector<int> vecLeft;
+    int arr[4] = {1,2,3,1};
+    
+    for(auto iter = ingredient.begin(); iter != ingredient.end(); iter++) {
+        vecLeft.push_back(*iter);
+        
+        if(vecLeft.size() > 3) {
+            auto iterTemp = vecLeft.end() - 4;
+            bool find = true;
+            for(auto j = 0; j < 4; j++) {
+                if(*(iterTemp + j) != arr[j]) {
+                    find = false;
+                    break;
+                }
+            }
+            
+            if(find) {
+                for(int i = 0; i < 4; i++)
+                    vecLeft.pop_back();
+                answer++;
+            }
+        }
+        
+    }
+    
+    return answer;
+}
