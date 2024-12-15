@@ -65,6 +65,7 @@ BEGIN_MESSAGE_MAP(CGrimTaskDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_WM_SIZE()
 END_MESSAGE_MAP()
 
 
@@ -106,6 +107,14 @@ BOOL CGrimTaskDlg::OnInitDialog()
 	rect.right = 1280;
 	rect.bottom = 1024;
 	MoveWindow(&rect);
+
+	// Title 폰트 생성 (초기화)
+	m_TitleFont.CreatePointFont(300, _T("Arial"));
+	GetDlgItem(IDC_STATIC_TITLE)->SetFont(&m_TitleFont);
+
+	m_NormalFont.CreatePointFont(150, _T("Arial"));
+	GetDlgItem(IDC_STATIC_START)->SetFont(&m_NormalFont);
+	GetDlgItem(IDC_STATIC_END)->SetFont(&m_NormalFont);
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
@@ -159,3 +168,52 @@ HCURSOR CGrimTaskDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+
+void CGrimTaskDlg::OnSize(UINT nType, int cx, int cy)
+{
+	CDialogEx::OnSize(nType, cx, cy);
+
+	if (!IsWindow(GetDlgItem(IDC_STATIC_TITLE)->GetSafeHwnd())) {
+		// 컨트롤이 초기화되지 않았다면 종료
+		return;
+	}
+
+	// TODO: 여기에 메시지 처리기 코드를 추가합니다.
+	// resource.h
+
+	int nMargin = 10; // 공통 여백
+	int nButtonWidth = cx / 6; // 버튼 너비
+	int nButtonHeight = cy / 20; // 버튼 높이 (조금 더 작게 조정)
+	int nInputWidth = cx / 8; // 입력창 너비
+	int nLabelHeight = cy / 25; // 입력창 높이 (조금 더 작게 조정)
+	int nLabelWidth = cx / 15; // 레이블 너비
+
+
+	// Title
+	GetDlgItem(IDC_STATIC_TITLE)->MoveWindow((cx - 200) / 2, nMargin, 500, 100); // 제목 크기와 위치 조정
+
+	// Start
+	int nStartX = cx / 6;
+	int nEndX = nStartX + nMargin * 70;
+
+	int nStartY = cy  / 10; // Start와 End의 Y 위치를 가운데로 조정
+	GetDlgItem(IDC_STATIC_START)->MoveWindow(nStartX - nMargin, nStartY, nLabelWidth, nLabelHeight);
+	GetDlgItem(IDC_STATIC_X1)->	  MoveWindow(nStartX + nMargin * 12, nStartY, nLabelWidth / 2, nLabelHeight);
+	GetDlgItem(IDC_EDIT_X1)->	  MoveWindow(nStartX + nMargin * 12 + nLabelWidth / 3.5, nStartY, nInputWidth, nLabelHeight);
+	GetDlgItem(IDC_STATIC_Y1)->	  MoveWindow(nStartX + nMargin * 15 + nLabelWidth / 2 + nInputWidth, nStartY, nLabelWidth / 2, nLabelHeight);
+	GetDlgItem(IDC_EDIT_Y1)->	  MoveWindow(nStartX + nMargin * 30 + nLabelWidth, nStartY, nInputWidth, nLabelHeight);
+	GetDlgItem(IDC_BTN_DRAW)->	  MoveWindow(nEndX, nStartY - 5, nButtonWidth, nButtonHeight);
+
+	// End
+	int nEndY = nStartY + 50; // Start와 End의 간격 조정
+	GetDlgItem(IDC_STATIC_END)->MoveWindow(nStartX - nMargin, nEndY, nLabelWidth, nLabelHeight);
+	GetDlgItem(IDC_STATIC_X2)-> MoveWindow(nStartX + nMargin * 12, nEndY, nLabelWidth / 2, nLabelHeight);
+	GetDlgItem(IDC_EDIT_X2)->	MoveWindow(nStartX + nMargin * 12 + nLabelWidth / 3.5, nEndY, nInputWidth, nLabelHeight);
+	GetDlgItem(IDC_STATIC_Y2)->	MoveWindow(nStartX + nMargin * 15 + nLabelWidth / 2 + nInputWidth, nEndY, nLabelWidth / 2, nLabelHeight);
+	GetDlgItem(IDC_EDIT_Y2)->	MoveWindow(nStartX + nMargin * 30 + nLabelWidth, nEndY, nInputWidth, nLabelHeight);
+	GetDlgItem(IDC_BTN_ACTION)->MoveWindow(nEndX, nEndY, nButtonWidth, nButtonHeight);
+
+	// Bottom Line
+	GetDlgItem(IDC_BTN_LOAD_IMG)->MoveWindow(cx / 2 - nButtonWidth - nMargin, cy - nButtonHeight - nMargin, nButtonWidth, nButtonHeight);
+	GetDlgItem(IDC_BTN_CLOSE)->MoveWindow(cx / 2 + nMargin, cy - nButtonHeight - nMargin, nButtonWidth, nButtonHeight);
+}
