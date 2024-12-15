@@ -66,6 +66,8 @@ BEGIN_MESSAGE_MAP(CGrimTaskDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	ON_WM_SIZE()
+	ON_BN_CLICKED(IDC_BTN_DRAW, &CGrimTaskDlg::OnBnClickedBtnDraw)
+	ON_WM_DESTROY()
 END_MESSAGE_MAP()
 
 
@@ -104,7 +106,7 @@ BOOL CGrimTaskDlg::OnInitDialog()
 	// Set size of the dlg
 	CRect rect;
 	GetClientRect(&rect);
-	rect.right = DLG_WEIGHT;
+	rect.right = DLG_WIDTH;
 	rect.bottom = DLG_HEIGHT;
 	MoveWindow(&rect);
 
@@ -117,11 +119,11 @@ BOOL CGrimTaskDlg::OnInitDialog()
 	GetDlgItem(IDC_STATIC_END)->SetFont(&m_fontNormal);
 
 	// image
-	int nWidth = (double)rect.right * IMAGE_WIDTH_RATE;
-	int nHeight = (double)rect.bottom * IMAGE_HEIGHT_RATE;
+	m_nImageWidth= rect.right * IMAGE_WIDTH_RATE;
+	m_nImageHeight = rect.bottom * IMAGE_HEIGHT_RATE;
 	int nBpp = 8;
 
-	m_image.Create(nWidth, nHeight, nBpp);
+	m_image.Create(m_nImageWidth, m_nImageHeight, nBpp);
 	if (nBpp == 8) {
 		static RGBQUAD rgb[256];
 		for (int i = 0; i < 256; i++)
@@ -132,8 +134,8 @@ BOOL CGrimTaskDlg::OnInitDialog()
 	int nPitch = m_image.GetPitch();
 	unsigned char* fm = (unsigned char*)m_image.GetBits();
 
-	for (int j = 0; j < nHeight; j++) {
-		for (int i = 0; i < nWidth; i++) {
+	for (int j = 0; j < m_nImageHeight; j++) {
+		for (int i = 0; i < m_nImageWidth; i++) {
 			fm[j * nPitch + i] = 128;
 		}
 	}
@@ -259,11 +261,11 @@ void CGrimTaskDlg::OnSize(UINT nType, int cx, int cy)
 	if (!m_image.IsNull()) {
 		m_image.Destroy();
 
-		int nImageWidth = cx * IMAGE_WIDTH_RATE;
-		int nImageHeight = cy * IMAGE_HEIGHT_RATE;
+		m_nImageWidth = cx * IMAGE_WIDTH_RATE;
+		m_nImageHeight = cy * IMAGE_HEIGHT_RATE;
 		int nBpp = 8;
 
-		m_image.Create(nImageWidth, nImageHeight, nBpp);
+		m_image.Create(m_nImageWidth, m_nImageHeight, nBpp);
 		if (nBpp == 8) {
 			static RGBQUAD rgb[256];
 			for (int i = 0; i < 256; i++)
@@ -274,15 +276,48 @@ void CGrimTaskDlg::OnSize(UINT nType, int cx, int cy)
 		int nPitch = m_image.GetPitch();
 		unsigned char* fm = (unsigned char*)m_image.GetBits();
 
-		for (int j = 0; j < nImageHeight; j++) {
-			for (int i = 0; i < nImageWidth; i++) {
-				fm[j * nPitch + i] = 128;
+		for (int j = 0; j < m_nImageHeight; j++) {
+			for (int i = 0; i < m_nImageWidth; i++) {
+				fm[j * nPitch + i] = COLOR_GRAY;
 			}
 		}
 
 		CClientDC dc(this);
 		m_image.Draw(dc, 0, 0);
+
+		Invalidate(TRUE);
+	}
+}
+
+void CGrimTaskDlg::OnBnClickedBtnDraw()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	int nPitch = m_image.GetPitch();
+	unsigned char* fm = (unsigned char*)m_image.GetBits();
+
+	for (int j = 0; j < m_nImageHeight; j++) {
+		for (int i = 0; i < m_nImageWidth; i++) {
+			fm[j * nPitch + i] = COLOR_GRAY;
+		}
 	}
 
+	BOOL bDraw = m_grimCV->DrawCircle(fm, nPitch, m_nImageWidth, m_nImageHeight);
+
+	if (!bDraw) {
+		AfxMessageBox(_T("Failed to Draw Circle"));
+		return;
+	}
+
+	CClientDC dc(this);
+	m_image.Draw(dc, 0, 0);
+
 	Invalidate(TRUE);
+}
+
+
+void CGrimTaskDlg::OnDestroy()
+{
+	CDialogEx::OnDestroy();
+
+	// TODO: 여기에 메시지 처리기 코드를 추가합니다.
 }

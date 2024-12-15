@@ -184,6 +184,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
+    <ClInclude Include="GrimCV.h" />
     <ClInclude Include="GrimTask.h" />
     <ClInclude Include="GrimTaskDlg.h" />
     <ClInclude Include="pch.h" />
@@ -191,6 +192,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="GrimCV.cpp" />
     <ClCompile Include="GrimTask.cpp" />
     <ClCompile Include="GrimTaskDlg.cpp" />
     <ClCompile Include="pch.cpp">

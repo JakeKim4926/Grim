@@ -1,12 +1,13 @@
 ﻿
 // GrimTaskDlg.h: 헤더 파일
 //
+#include "GrimCV.h"
 
 #pragma once
 
 #define IMAGE_WIDTH_RATE	0.7
 #define IMAGE_HEIGHT_RATE	0.65
-#define DLG_WEIGHT			1280
+#define DLG_WIDTH			1280
 #define DLG_HEIGHT			1024
 
 // CGrimTaskDlg 대화 상자
@@ -43,4 +44,13 @@ private:
 	CFont m_fontNormal;
 
 	CImage m_image;
+
+	C_GrimCV* m_grimCV;
+
+	int m_nImageWidth;
+	int m_nImageHeight;
+;	
+public:
+	afx_msg void OnBnClickedBtnDraw();
+	afx_msg void OnDestroy();
 };
