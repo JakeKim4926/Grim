@@ -68,6 +68,7 @@ BEGIN_MESSAGE_MAP(CGrimTaskDlg, CDialogEx)
 	ON_WM_SIZE()
 	ON_BN_CLICKED(IDC_BTN_DRAW, &CGrimTaskDlg::OnBnClickedBtnDraw)
 	ON_WM_DESTROY()
+	ON_BN_CLICKED(IDC_BTN_ACTION, &CGrimTaskDlg::OnBnClickedBtnAction)
 END_MESSAGE_MAP()
 
 
@@ -319,5 +320,44 @@ void CGrimTaskDlg::OnDestroy()
 {
 	CDialogEx::OnDestroy();
 
+	delete m_grimCV;
+
 	// TODO: 여기에 메시지 처리기 코드를 추가합니다.
+}
+
+
+void CGrimTaskDlg::OnBnClickedBtnAction()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	CString strX1;
+	CString strY1;
+	CString strX2;
+	CString strY2;
+
+	int nX1 = 0;
+	int nY1 = 0;
+	int nX2 = 0;
+	int nY2 = 0;
+
+	GetDlgItem(IDC_EDIT_X1)->GetWindowText(strX1);
+	GetDlgItem(IDC_EDIT_Y1)->GetWindowText(strY1);
+	GetDlgItem(IDC_EDIT_X2)->GetWindowText(strX2);
+	GetDlgItem(IDC_EDIT_Y2)->GetWindowText(strY2);
+
+	nX1 = _ttoi(strX1);
+	nY1 = _ttoi(strY1);
+	nX2 = _ttoi(strX2);
+	nY2 = _ttoi(strY2);
+
+	if (nX1 <= 0 || nY1 <= 0 || nX2 <= 0 || nY2 <= 0 ||
+		nX1 >= m_nImageWidth || nY1 >= m_nImageHeight || nX2 >= m_nImageWidth || nY2 >= m_nImageHeight) {
+
+		CString strSize;
+		strSize.Format(_T("%d,%d"), m_nImageWidth, m_nImageHeight);
+
+		AfxMessageBox(_T("값이 0이하이거나 범위 값 : ") + strSize + _T("을 벗어난 값이 입력되었습니다."));
+		return;
+	}
+
+
 }

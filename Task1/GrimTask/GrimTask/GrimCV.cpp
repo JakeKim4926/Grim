@@ -27,7 +27,6 @@ BOOL C_GrimCV::DrawCircle(unsigned char* pucImg, int nPitch, int nImageWidth, in
     } while (nX - nRadius < 0 || nX + nRadius >= nImageWidth ||
                 nY - nRadius < 0 || nY + nRadius >= nImageHeight);
 
-    
     // draw circle
     for (int y = 0; y < nImageHeight; y++) {
         for (int x = 0; x < nImageWidth; x++) {
