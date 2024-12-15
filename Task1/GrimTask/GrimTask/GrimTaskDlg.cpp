@@ -20,15 +20,15 @@ class CAboutDlg : public CDialogEx
 public:
 	CAboutDlg();
 
-// 대화 상자 데이터입니다.
+	// 대화 상자 데이터입니다.
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_ABOUTBOX };
 #endif
 
-	protected:
+protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 지원입니다.
 
-// 구현입니다.
+	// 구현입니다.
 protected:
 	DECLARE_MESSAGE_MAP()
 };
@@ -104,17 +104,42 @@ BOOL CGrimTaskDlg::OnInitDialog()
 	// Set size of the dlg
 	CRect rect;
 	GetClientRect(&rect);
-	rect.right = 1280;
-	rect.bottom = 1024;
+	rect.right = DLG_WEIGHT;
+	rect.bottom = DLG_HEIGHT;
 	MoveWindow(&rect);
 
-	// Title 폰트 생성 (초기화)
-	m_TitleFont.CreatePointFont(300, _T("Arial"));
-	GetDlgItem(IDC_STATIC_TITLE)->SetFont(&m_TitleFont);
+	// Font
+	m_fontTitle.CreatePointFont(300, _T("Arial"));
+	GetDlgItem(IDC_STATIC_TITLE)->SetFont(&m_fontTitle);
 
-	m_NormalFont.CreatePointFont(150, _T("Arial"));
-	GetDlgItem(IDC_STATIC_START)->SetFont(&m_NormalFont);
-	GetDlgItem(IDC_STATIC_END)->SetFont(&m_NormalFont);
+	m_fontNormal.CreatePointFont(150, _T("Arial"));
+	GetDlgItem(IDC_STATIC_START)->SetFont(&m_fontNormal);
+	GetDlgItem(IDC_STATIC_END)->SetFont(&m_fontNormal);
+
+	// image
+	int nWidth = (double)rect.right * IMAGE_WIDTH_RATE;
+	int nHeight = (double)rect.bottom * IMAGE_HEIGHT_RATE;
+	int nBpp = 8;
+
+	m_image.Create(nWidth, nHeight, nBpp);
+	if (nBpp == 8) {
+		static RGBQUAD rgb[256];
+		for (int i = 0; i < 256; i++)
+			rgb[i].rgbRed = rgb[i].rgbGreen = rgb[i].rgbBlue = i;
+		m_image.SetColorTable(0, 256, rgb);
+	}
+
+	int nPitch = m_image.GetPitch();
+	unsigned char* fm = (unsigned char*)m_image.GetBits();
+
+	for (int j = 0; j < nHeight; j++) {
+		for (int i = 0; i < nWidth; i++) {
+			fm[j * nPitch + i] = 128;
+		}
+	}
+
+	CClientDC dc(this);
+	m_image.Draw(dc, 0, 0);
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
@@ -138,6 +163,9 @@ void CGrimTaskDlg::OnSysCommand(UINT nID, LPARAM lParam)
 
 void CGrimTaskDlg::OnPaint()
 {
+	CRect rect;
+	GetClientRect(&rect);
+
 	if (IsIconic())
 	{
 		CPaintDC dc(this); // 그리기를 위한 디바이스 컨텍스트입니다.
@@ -147,8 +175,7 @@ void CGrimTaskDlg::OnPaint()
 		// 클라이언트 사각형에서 아이콘을 가운데에 맞춥니다.
 		int cxIcon = GetSystemMetrics(SM_CXICON);
 		int cyIcon = GetSystemMetrics(SM_CYICON);
-		CRect rect;
-		GetClientRect(&rect);
+
 		int x = (rect.Width() - cxIcon + 1) / 2;
 		int y = (rect.Height() - cyIcon + 1) / 2;
 
@@ -157,6 +184,16 @@ void CGrimTaskDlg::OnPaint()
 	}
 	else
 	{
+		CPaintDC dc(this); // 클라이언트 영역 그리기용 DC
+
+		// m_image를 그리기
+		int nImageX = rect.Width() / 8;
+		int nImageY = rect.Height() / 4.5;
+
+		if (!m_image.IsNull()) {
+			m_image.Draw(dc, nImageX, nImageY);
+		}
+
 		CDialogEx::OnPaint();
 	}
 }
@@ -179,7 +216,7 @@ void CGrimTaskDlg::OnSize(UINT nType, int cx, int cy)
 	}
 
 	// TODO: 여기에 메시지 처리기 코드를 추가합니다.
-	// resource.h
+
 
 	int nMargin = 10; // 공통 여백
 	int nButtonWidth = cx / 6; // 버튼 너비
@@ -192,11 +229,12 @@ void CGrimTaskDlg::OnSize(UINT nType, int cx, int cy)
 	// Title
 	GetDlgItem(IDC_STATIC_TITLE)->MoveWindow((cx - 200) / 2, nMargin, 500, 100); // 제목 크기와 위치 조정
 
+
 	// Start
 	int nStartX = cx / 6;
 	int nEndX = nStartX + nMargin * 70;
 
-	int nStartY = cy  / 10; // Start와 End의 Y 위치를 가운데로 조정
+	int nStartY = cy / 10; // Start와 End의 Y 위치를 가운데로 조정
 	GetDlgItem(IDC_STATIC_START)->MoveWindow(nStartX - nMargin, nStartY, nLabelWidth, nLabelHeight);
 	GetDlgItem(IDC_STATIC_X1)->	  MoveWindow(nStartX + nMargin * 12, nStartY, nLabelWidth / 2, nLabelHeight);
 	GetDlgItem(IDC_EDIT_X1)->	  MoveWindow(nStartX + nMargin * 12 + nLabelWidth / 3.5, nStartY, nInputWidth, nLabelHeight);
@@ -207,7 +245,7 @@ void CGrimTaskDlg::OnSize(UINT nType, int cx, int cy)
 	// End
 	int nEndY = nStartY + 50; // Start와 End의 간격 조정
 	GetDlgItem(IDC_STATIC_END)->MoveWindow(nStartX - nMargin, nEndY, nLabelWidth, nLabelHeight);
-	GetDlgItem(IDC_STATIC_X2)-> MoveWindow(nStartX + nMargin * 12, nEndY, nLabelWidth / 2, nLabelHeight);
+	GetDlgItem(IDC_STATIC_X2)->	MoveWindow(nStartX + nMargin * 12, nEndY, nLabelWidth / 2, nLabelHeight);
 	GetDlgItem(IDC_EDIT_X2)->	MoveWindow(nStartX + nMargin * 12 + nLabelWidth / 3.5, nEndY, nInputWidth, nLabelHeight);
 	GetDlgItem(IDC_STATIC_Y2)->	MoveWindow(nStartX + nMargin * 15 + nLabelWidth / 2 + nInputWidth, nEndY, nLabelWidth / 2, nLabelHeight);
 	GetDlgItem(IDC_EDIT_Y2)->	MoveWindow(nStartX + nMargin * 30 + nLabelWidth, nEndY, nInputWidth, nLabelHeight);
@@ -216,4 +254,35 @@ void CGrimTaskDlg::OnSize(UINT nType, int cx, int cy)
 	// Bottom Line
 	GetDlgItem(IDC_BTN_LOAD_IMG)->MoveWindow(cx / 2 - nButtonWidth - nMargin, cy - nButtonHeight - nMargin, nButtonWidth, nButtonHeight);
 	GetDlgItem(IDC_BTN_CLOSE)->MoveWindow(cx / 2 + nMargin, cy - nButtonHeight - nMargin, nButtonWidth, nButtonHeight);
+
+	// Image
+	if (!m_image.IsNull()) {
+		m_image.Destroy();
+
+		int nImageWidth = cx * IMAGE_WIDTH_RATE;
+		int nImageHeight = cy * IMAGE_HEIGHT_RATE;
+		int nBpp = 8;
+
+		m_image.Create(nImageWidth, nImageHeight, nBpp);
+		if (nBpp == 8) {
+			static RGBQUAD rgb[256];
+			for (int i = 0; i < 256; i++)
+				rgb[i].rgbRed = rgb[i].rgbGreen = rgb[i].rgbBlue = i;
+			m_image.SetColorTable(0, 256, rgb);
+		}
+
+		int nPitch = m_image.GetPitch();
+		unsigned char* fm = (unsigned char*)m_image.GetBits();
+
+		for (int j = 0; j < nImageHeight; j++) {
+			for (int i = 0; i < nImageWidth; i++) {
+				fm[j * nPitch + i] = 128;
+			}
+		}
+
+		CClientDC dc(this);
+		m_image.Draw(dc, 0, 0);
+	}
+
+	Invalidate(TRUE);
 }

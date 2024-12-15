@@ -4,6 +4,10 @@
 
 #pragma once
 
+#define IMAGE_WIDTH_RATE	0.7
+#define IMAGE_HEIGHT_RATE	0.65
+#define DLG_WEIGHT			1280
+#define DLG_HEIGHT			1024
 
 // CGrimTaskDlg 대화 상자
 class CGrimTaskDlg : public CDialogEx
@@ -35,6 +39,8 @@ public:
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 
 private:
-	CFont m_TitleFont;
-	CFont m_NormalFont;
+	CFont m_fontTitle;
+	CFont m_fontNormal;
+
+	CImage m_image;
 };
