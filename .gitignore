@@ -1,0 +1,76 @@
+# 빌드 출력 디렉터리
+Debug/
+Release/
+x64/
+x86/
+[Bb]uild/
+[Bb]in/
+[Oo]bj/
+
+# Visual Studio 관련 파일
+.vs/
+*.user
+*.suo
+*.vcxproj.user
+*.opendb
+*.VC.db
+
+# IntelliSense 캐시 파일
+*.ipch
+*.aps
+*.ncb
+
+# C++ 빌드 캐시 파일
+*.obj
+*.pch
+*.ilk
+*.log
+*.tlog
+*.idb
+*.pdb
+*.exp
+*.lib
+*.exe
+*.dll
+*.manifest
+*.map
+
+# MFC/C++ 프로젝트 파일
+*.sdf
+*.cache
+*.log
+*.wlog
+*.hmap
+*.iobj
+*.ipdb
+*.tlog
+
+# 단위 테스트 실행 결과
+TestResults/
+
+# 임시 파일
+*.tmp
+*.temp
+*.log
+
+# 크래시 덤프 파일
+*.mdmp
+*.dmp
+
+# 프로젝트 백업 파일
+*.bak
+*.old
+*.orig
+
+# 자동 생성 리소스 파일
+*.res
+*.aps
+
+# Git 자체 파일
+*.orig
+*.rej
+
+# 기타 파일
+Thumbs.db
+Desktop.ini
+.DS_Store
