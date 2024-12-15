@@ -144,6 +144,8 @@ BOOL CGrimTaskDlg::OnInitDialog()
 	CClientDC dc(this);
 	m_image.Draw(dc, 0, 0);
 
+	m_grimCV = new C_GrimCV;
+
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
 
@@ -293,6 +295,29 @@ void CGrimTaskDlg::OnSize(UINT nType, int cx, int cy)
 void CGrimTaskDlg::OnBnClickedBtnDraw()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+
+	CString strX1;
+	CString strY1;
+
+	int nX1 = 0;
+	int nY1 = 0;
+
+	GetDlgItem(IDC_EDIT_X1)->GetWindowText(strX1);
+	GetDlgItem(IDC_EDIT_Y1)->GetWindowText(strY1);
+
+	nX1 = _ttoi(strX1);
+	nY1 = _ttoi(strY1);
+
+	if (nX1 <= 0 || nY1 <= 0 || nX1 >= m_nImageWidth || nY1 >= m_nImageHeight ) {
+		CString strSize;
+		strSize.Format(_T("%d,%d"), m_nImageWidth, m_nImageHeight);
+
+		AfxMessageBox(_T("값이 0이하이거나 범위 값 : ") + strSize + _T("을 벗어난 값이 입력되었습니다."));
+		return;
+	}
+
+	m_grimCV->setCoordinate(nX1, nY1, 0, 0);
+
 	int nPitch = m_image.GetPitch();
 	unsigned char* fm = (unsigned char*)m_image.GetBits();
 

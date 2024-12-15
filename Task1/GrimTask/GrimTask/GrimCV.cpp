@@ -15,15 +15,13 @@ BOOL C_GrimCV::DrawCircle(unsigned char* pucImg, int nPitch, int nImageWidth, in
 {
 	srand((unsigned int)time(NULL));
 
-    int nX;
-    int nY;
+    int nX = m_sCoordinate.m_nX1;
+    int nY = m_sCoordinate.m_nY1;
     int nRadius;
 
     // get circle
     do {
         nRadius = rand() % (std::min(nImageWidth, nImageHeight) / 2);
-        nX = rand() % nImageWidth;
-        nY = rand() % nImageHeight;
     } while (nX - nRadius < 0 || nX + nRadius >= nImageWidth ||
                 nY - nRadius < 0 || nY + nRadius >= nImageHeight);
 
@@ -39,9 +37,9 @@ BOOL C_GrimCV::DrawCircle(unsigned char* pucImg, int nPitch, int nImageWidth, in
     return TRUE;
 }
 
-BOOL C_GrimCV::Action()
+BOOL C_GrimCV::Action(unsigned char* pucImg, int nPitch, int nImageWidth, int nImageHeigh)
 {
-	return 0;
+    return 0;
 }
 
 BOOL C_GrimCV::OpenImage()
@@ -52,4 +50,14 @@ BOOL C_GrimCV::OpenImage()
 BOOL C_GrimCV::DetectCircle()
 {
 	return 0;
+}
+
+void C_GrimCV::setCoordinate(int nX1, int nY1, int nX2, int nY2)
+{
+    m_sCoordinate.setCoordinate(nX1, nY1, nX2, nY2);
+}
+
+S_Coordinate C_GrimCV::getCoordinate()
+{
+    return S_Coordinate();
 }
