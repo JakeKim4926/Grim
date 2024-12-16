@@ -171,36 +171,18 @@ void CGrimTaskDlg::OnPaint()
 	CRect rect;
 	GetClientRect(&rect);
 
-	if (IsIconic())
-	{
-		CPaintDC dc(this); // 그리기를 위한 디바이스 컨텍스트입니다.
+	
+	CPaintDC dc(this); // 클라이언트 영역 그리기용 DC
 
-		SendMessage(WM_ICONERASEBKGND, reinterpret_cast<WPARAM>(dc.GetSafeHdc()), 0);
+	// m_image를 그리기
+	int nImageX = rect.Width() / 8;
+	int nImageY = rect.Height() / 4.5;
 
-		// 클라이언트 사각형에서 아이콘을 가운데에 맞춥니다.
-		int cxIcon = GetSystemMetrics(SM_CXICON);
-		int cyIcon = GetSystemMetrics(SM_CYICON);
-
-		int x = (rect.Width() - cxIcon + 1) / 2;
-		int y = (rect.Height() - cyIcon + 1) / 2;
-
-		// 아이콘을 그립니다.
-		dc.DrawIcon(x, y, m_hIcon);
+	if (!m_image.IsNull()) {
+		m_image.Draw(dc, nImageX, nImageY);
 	}
-	else
-	{
-		CPaintDC dc(this); // 클라이언트 영역 그리기용 DC
 
-		// m_image를 그리기
-		int nImageX = rect.Width() / 8;
-		int nImageY = rect.Height() / 4.5;
-
-		if (!m_image.IsNull()) {
-			m_image.Draw(dc, nImageX, nImageY);
-		}
-
-		CDialogEx::OnPaint();
-	}
+	CDialogEx::OnPaint();
 }
 
 // 사용자가 최소화된 창을 끄는 동안에 커서가 표시되도록 시스템에서
@@ -285,9 +267,6 @@ void CGrimTaskDlg::OnSize(UINT nType, int cx, int cy)
 			}
 		}
 
-		CClientDC dc(this);
-		m_image.Draw(dc, 0, 0);
-
 		Invalidate(TRUE);
 	}
 }
@@ -335,10 +314,8 @@ void CGrimTaskDlg::OnBnClickedBtnDraw()
 		return;
 	}
 
-	CClientDC dc(this);
-	m_image.Draw(dc, 0, 0);
-
-	Invalidate(TRUE);
+	
+	Invalidate(FALSE);
 }
 
 
@@ -402,8 +379,36 @@ void CGrimTaskDlg::OnBnClickedBtnAction()
 	GetDlgItem(IDC_EDIT_X1)->SetWindowText(strX1);
 	GetDlgItem(IDC_EDIT_Y1)->SetWindowText(strY1);
 
-	CClientDC dc(this);
-	m_image.Draw(dc, 0, 0);
+	// save
+	if (bAction) {
+		TCHAR chPath[256] = { 0, };
+		GetModuleFileName(NULL, chPath, 256);
 
-	Invalidate(TRUE);
+		CString folderPath(chPath);
+		folderPath = folderPath.Left(folderPath.ReverseFind('\\')) + _T("/image");
+
+		if (GetFileAttributes(folderPath) == INVALID_FILE_ATTRIBUTES) {
+			if (!CreateDirectory(folderPath, NULL)) {
+				AfxMessageBox(_T("폴더 생성 실패!"));
+				return;
+			}
+		}
+
+		SYSTEMTIME sysTime;
+		GetLocalTime(&sysTime);
+
+		CString strFileName;
+		strFileName.Format(folderPath + _T("/image_%04d%02d%02d_%02d%02d%02d_%03d.bmp"),
+			sysTime.wYear,
+			sysTime.wMonth,
+			sysTime.wDay,
+			sysTime.wHour,
+			sysTime.wMinute,
+			sysTime.wSecond,
+			sysTime.wMilliseconds);
+
+		m_image.Save(strFileName);
+	}
+
+	Invalidate(FALSE);
 }
