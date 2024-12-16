@@ -316,6 +316,7 @@ void CGrimTaskDlg::OnBnClickedBtnDraw()
 		return;
 	}
 
+	// draw
 	m_grimCV->setCoordinate(nX1, nY1, 0, 0);
 
 	int nPitch = m_image.GetPitch();
@@ -354,8 +355,6 @@ void CGrimTaskDlg::OnDestroy()
 void CGrimTaskDlg::OnBnClickedBtnAction()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	CString strX1;
-	CString strY1;
 	CString strX2;
 	CString strY2;
 
@@ -364,25 +363,47 @@ void CGrimTaskDlg::OnBnClickedBtnAction()
 	int nX2 = 0;
 	int nY2 = 0;
 
-	GetDlgItem(IDC_EDIT_X1)->GetWindowText(strX1);
-	GetDlgItem(IDC_EDIT_Y1)->GetWindowText(strY1);
 	GetDlgItem(IDC_EDIT_X2)->GetWindowText(strX2);
 	GetDlgItem(IDC_EDIT_Y2)->GetWindowText(strY2);
 
-	nX1 = _ttoi(strX1);
-	nY1 = _ttoi(strY1);
+	nX1 = m_grimCV->getCoordinate().m_nX1;
+	nY1 = m_grimCV->getCoordinate().m_nY1;
 	nX2 = _ttoi(strX2);
 	nY2 = _ttoi(strY2);
 
-	if (nX1 <= 0 || nY1 <= 0 || nX2 <= 0 || nY2 <= 0 ||
+	if (nX1  <= 0 || nY1 <= 0 || nX2 <= 0 || nY2 <= 0 ||
 		nX1 >= m_nImageWidth || nY1 >= m_nImageHeight || nX2 >= m_nImageWidth || nY2 >= m_nImageHeight) {
 
 		CString strSize;
 		strSize.Format(_T("%d,%d"), m_nImageWidth, m_nImageHeight);
 
-		AfxMessageBox(_T("값이 0이하이거나 범위 값 : ") + strSize + _T("을 벗어난 값이 입력되었습니다."));
+		AfxMessageBox(_T("원이 그려진 상태가 아니거나 , 범위 값 : ") + strSize + _T("을 벗어난 값이 입력되었습니다."));
+		
+		return;
+	} else if (nX1 == nX2 && nY1 == nY2) {
+		
+		AfxMessageBox(_T("두 좌표의 값이 같습니다."));
 		return;
 	}
 
+	// draw
+	m_grimCV->setCoordinate(nX1, nY1, nX2, nY2);
 
+	int nPitch = m_image.GetPitch();
+	unsigned char* fm = (unsigned char*)m_image.GetBits();
+
+	BOOL bAction = m_grimCV->Action(fm, nPitch, m_nImageWidth, m_nImageHeight);
+
+	CString strX1;
+	CString strY1;
+	strX1.Format(_T("%d"), m_grimCV->getCoordinate().m_nX1);
+	strY1.Format(_T("%d"), m_grimCV->getCoordinate().m_nY1);
+
+	GetDlgItem(IDC_EDIT_X1)->SetWindowText(strX1);
+	GetDlgItem(IDC_EDIT_Y1)->SetWindowText(strY1);
+
+	CClientDC dc(this);
+	m_image.Draw(dc, 0, 0);
+
+	Invalidate(TRUE);
 }

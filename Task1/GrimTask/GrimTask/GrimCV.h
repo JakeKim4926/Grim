@@ -1,5 +1,6 @@
 #include "pch.h"
 
+
 struct S_Coordinate {
 	int m_nX1;
 	int m_nY1;
@@ -25,17 +26,25 @@ struct S_Coordinate {
 class C_GrimCV {
 private:
 	S_Coordinate m_sCoordinate;
+	int m_nRadius;
 
 public:
 	C_GrimCV();
 	~C_GrimCV();
 
 	BOOL DrawCircle(unsigned char* pucImg, int nPitch, int nImageWidth, int nImageHeight);
-	BOOL Action(unsigned char* pucImg, int nPitch, int nImageWidth, int nImageHeigh);
+	BOOL Action(unsigned char* pucImg, int nPitch, int nImageWidth, int nImageHeight);
 	BOOL OpenImage();
 	BOOL DetectCircle();
 
+	BOOL ShiftImageUp();
+	BOOL ShiftImageDown(int nHeight);
+	BOOL ShiftImageLeft();
+	BOOL ShiftImageRight(int width);
+
 	void setCoordinate(int nX1, int nY1, int nX2, int nY2);
 	S_Coordinate getCoordinate();
+
+	int getRadius();
 
 };

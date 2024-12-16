@@ -21,3 +21,4 @@
 #define COLOR_WHITE 255
 #define COLOR_GRAY 125
 #define COLOR_BLACK 0
+#define MOVE_VALUE 3
