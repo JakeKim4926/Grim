@@ -257,7 +257,7 @@ void CGrimTaskDlg::OnPaint()
 
 	// m_image를 그리기
 	int nImageX = rect.Width() / 8;
-	int nImageY = rect.Height() / 4.5;
+	int nImageY = rect.Height() / 3.5;
 
 	if (!m_image.IsNull()) {
 		m_image.Draw(dc, nImageX, nImageY);
@@ -279,56 +279,66 @@ void CGrimTaskDlg::OnSize(UINT nType, int cx, int cy)
 	CDialogEx::OnSize(nType, cx, cy);
 
 	if (!IsWindow(GetDlgItem(IDC_STATIC_TITLE)->GetSafeHwnd())) {
-		// 컨트롤이 초기화되지 않았다면 종료
 		return;
 	}
 
-	// TODO: 여기에 메시지 처리기 코드를 추가합니다.
+	CRect wndRect;
+	GetWindowRect(&wndRect);
+	int nDlgWidth = wndRect.Width();
+	int nDlgHeight = wndRect.Height();
+
+	// size of static, button, margin
+	int nMargin = 20;
+	int nButtonWidth = nDlgWidth / 8;
+	int nButtonHeight = nDlgHeight / 20;
+	int nInputWidth = nDlgWidth / 10;
+	int nLabelHeight = nDlgHeight / 25;
+	int nLabelWidth = nDlgWidth / 12;
+
+	// location of title
+	int nTitleX = nDlgWidth / 2.5; 
+	int nTitleY = nMargin;
+
+	GetDlgItem(IDC_STATIC_TITLE)->SetWindowPos(NULL, nTitleX, nTitleY, 500, 100, SWP_NOZORDER | SWP_NOACTIVATE);
+
+	// location of static, edit box, buttons (draw, action)
+	int nStartY = nDlgHeight / 8;
+	int nStartX = nDlgWidth / 5;
+	int nInputX = nDlgWidth / 3;
+	GetDlgItem(IDC_STATIC_START)->SetWindowPos(NULL, nStartX, nStartY, nLabelWidth, nLabelHeight, SWP_NOZORDER | SWP_NOACTIVATE);
+	GetDlgItem(IDC_STATIC_X1)->   SetWindowPos(NULL, nInputX, nStartY + 5, nLabelWidth / 3, nLabelHeight, SWP_NOZORDER | SWP_NOACTIVATE);
+	GetDlgItem(IDC_EDIT_X1)->	  SetWindowPos(NULL, nInputX + nMargin*2.5 , nStartY, nInputWidth, nLabelHeight, SWP_NOZORDER | SWP_NOACTIVATE);
+
+	GetDlgItem(IDC_STATIC_Y1)->SetWindowPos(NULL, nInputX + nMargin * 4 + nInputWidth, nStartY + 5, nLabelWidth / 3, nLabelHeight, SWP_NOZORDER | SWP_NOACTIVATE);
+	GetDlgItem(IDC_EDIT_Y1)->  SetWindowPos(NULL, nInputX + nMargin * 4 + nInputWidth + nMargin*2.5, nStartY, nInputWidth, nLabelHeight, SWP_NOZORDER | SWP_NOACTIVATE);
+	
+	GetDlgItem(IDC_BTN_DRAW)->SetWindowPos(NULL, nDlgWidth * 0.7, nStartY - (nButtonHeight / 6), nButtonWidth, nButtonHeight, SWP_NOZORDER | SWP_NOACTIVATE);
 
 
-	int nMargin = 10; // 공통 여백
-	int nButtonWidth = cx / 6; // 버튼 너비
-	int nButtonHeight = cy / 20; // 버튼 높이 (조금 더 작게 조정)
-	int nInputWidth = cx / 8; // 입력창 너비
-	int nLabelHeight = cy / 25; // 입력창 높이 (조금 더 작게 조정)
-	int nLabelWidth = cx / 15; // 레이블 너비
+	int nEndY = nDlgHeight / 7 + nButtonHeight;
+	GetDlgItem(IDC_STATIC_END)->SetWindowPos(NULL, nStartX, nEndY, nLabelWidth, nLabelHeight, SWP_NOZORDER | SWP_NOACTIVATE);
+	GetDlgItem(IDC_STATIC_X2)-> SetWindowPos(NULL, nInputX, nEndY + 5, nLabelWidth / 3, nLabelHeight, SWP_NOZORDER | SWP_NOACTIVATE);
+	GetDlgItem(IDC_EDIT_X2)->	SetWindowPos(NULL, nInputX + nMargin * 2.5, nEndY, nInputWidth, nLabelHeight, SWP_NOZORDER | SWP_NOACTIVATE);
 
+	GetDlgItem(IDC_STATIC_Y2)->SetWindowPos(NULL, nInputX + nMargin * 4 + nInputWidth, nEndY + 5, nLabelWidth / 3, nLabelHeight, SWP_NOZORDER | SWP_NOACTIVATE);
+	GetDlgItem(IDC_EDIT_Y2)->  SetWindowPos(NULL, nInputX + nMargin * 4 + nInputWidth + nMargin * 2.5, nEndY, nInputWidth, nLabelHeight, SWP_NOZORDER | SWP_NOACTIVATE);
 
-	// Title
-	GetDlgItem(IDC_STATIC_TITLE)->MoveWindow((cx - 200) / 2, nMargin, 500, 100); // 제목 크기와 위치 조정
+	GetDlgItem(IDC_BTN_ACTION)->SetWindowPos(NULL, nDlgWidth * 0.7, nEndY - (nButtonHeight / 4), nButtonWidth, nButtonHeight, SWP_NOZORDER | SWP_NOACTIVATE);
 
+	// location of static, edit box, buttons (open, close)
+	int nBottomY = nDlgHeight * 0.89;
+	int nCenterX = nDlgWidth / 2;
+	GetDlgItem(IDC_BTN_OPEN)-> SetWindowPos(NULL, nCenterX - nButtonWidth - nMargin, nBottomY, nButtonWidth, nButtonHeight, SWP_NOZORDER | SWP_NOACTIVATE);
+	GetDlgItem(IDC_BTN_CLOSE)->SetWindowPos(NULL, nCenterX + nMargin, nBottomY, nButtonWidth, nButtonHeight, SWP_NOZORDER | SWP_NOACTIVATE);
 
-	// Start
-	int nStartX = cx / 6;
-	int nEndX = nStartX + nMargin * 70;
-
-	int nStartY = cy / 10; // Start와 End의 Y 위치를 가운데로 조정
-	GetDlgItem(IDC_STATIC_START)->MoveWindow(nStartX - nMargin, nStartY, nLabelWidth, nLabelHeight);
-	GetDlgItem(IDC_STATIC_X1)->	  MoveWindow(nStartX + nMargin * 12, nStartY, nLabelWidth / 2, nLabelHeight);
-	GetDlgItem(IDC_EDIT_X1)->	  MoveWindow(nStartX + nMargin * 12 + nLabelWidth / 3.5, nStartY, nInputWidth, nLabelHeight);
-	GetDlgItem(IDC_STATIC_Y1)->	  MoveWindow(nStartX + nMargin * 15 + nLabelWidth / 2 + nInputWidth, nStartY, nLabelWidth / 2, nLabelHeight);
-	GetDlgItem(IDC_EDIT_Y1)->	  MoveWindow(nStartX + nMargin * 30 + nLabelWidth, nStartY, nInputWidth, nLabelHeight);
-	GetDlgItem(IDC_BTN_DRAW)->	  MoveWindow(nEndX, nStartY - 5, nButtonWidth, nButtonHeight);
-
-	// End
-	int nEndY = nStartY + 50; // Start와 End의 간격 조정
-	GetDlgItem(IDC_STATIC_END)->MoveWindow(nStartX - nMargin, nEndY, nLabelWidth, nLabelHeight);
-	GetDlgItem(IDC_STATIC_X2)->	MoveWindow(nStartX + nMargin * 12, nEndY, nLabelWidth / 2, nLabelHeight);
-	GetDlgItem(IDC_EDIT_X2)->	MoveWindow(nStartX + nMargin * 12 + nLabelWidth / 3.5, nEndY, nInputWidth, nLabelHeight);
-	GetDlgItem(IDC_STATIC_Y2)->	MoveWindow(nStartX + nMargin * 15 + nLabelWidth / 2 + nInputWidth, nEndY, nLabelWidth / 2, nLabelHeight);
-	GetDlgItem(IDC_EDIT_Y2)->	MoveWindow(nStartX + nMargin * 30 + nLabelWidth, nEndY, nInputWidth, nLabelHeight);
-	GetDlgItem(IDC_BTN_ACTION)->MoveWindow(nEndX, nEndY, nButtonWidth, nButtonHeight);
-
-	// Bottom Line
-	GetDlgItem(IDC_BTN_OPEN)->MoveWindow(cx / 2 - nButtonWidth - nMargin, cy - nButtonHeight - nMargin, nButtonWidth, nButtonHeight);
-	GetDlgItem(IDC_BTN_CLOSE)->MoveWindow(cx / 2 + nMargin, cy - nButtonHeight - nMargin, nButtonWidth, nButtonHeight);
+	RedrawWindow(NULL, NULL, RDW_ALLCHILDREN | RDW_UPDATENOW | RDW_ERASE);
 
 	// Image
 	if (!m_image.IsNull()) {
 		m_image.Destroy();
 
-		m_nImageWidth = cx * IMAGE_WIDTH_RATE;
-		m_nImageHeight = cy * IMAGE_HEIGHT_RATE;
+		m_nImageWidth = nDlgWidth * IMAGE_WIDTH_RATE;
+		m_nImageHeight = nDlgHeight * IMAGE_HEIGHT_RATE;
 		int nBpp = 8;
 
 		m_image.Create(m_nImageWidth, m_nImageHeight, nBpp);
@@ -351,6 +361,7 @@ void CGrimTaskDlg::OnSize(UINT nType, int cx, int cy)
 		Invalidate(TRUE);
 	}
 }
+
 
 C_GrimCV* CGrimTaskDlg::getGrimCV()
 {

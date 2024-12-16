@@ -52,6 +52,8 @@ TestResults/
 *.tmp
 *.temp
 *.log
+*.jpg
+*.bmp
 
 # 크래시 덤프 파일
 *.mdmp

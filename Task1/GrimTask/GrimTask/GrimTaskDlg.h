@@ -5,8 +5,8 @@
 
 #pragma once
 
-#define IMAGE_WIDTH_RATE	0.7
-#define IMAGE_HEIGHT_RATE	0.65
+#define IMAGE_WIDTH_RATE	0.75
+#define IMAGE_HEIGHT_RATE	0.6
 #define DLG_WIDTH			1280
 #define DLG_HEIGHT			1024
 
