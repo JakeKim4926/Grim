@@ -150,6 +150,7 @@ BEGIN_MESSAGE_MAP(CGrimTaskDlg, CDialogEx)
 	ON_WM_DESTROY()
 	ON_BN_CLICKED(IDC_BTN_ACTION, &CGrimTaskDlg::OnBnClickedBtnAction)
 	ON_BN_CLICKED(IDC_BTN_OPEN, &CGrimTaskDlg::OnBnClickedBtnOpen)
+	ON_WM_GETMINMAXINFO()
 END_MESSAGE_MAP()
 
 
@@ -323,7 +324,7 @@ void CGrimTaskDlg::OnSize(UINT nType, int cx, int cy)
 	GetDlgItem(IDC_STATIC_Y2)->SetWindowPos(NULL, nInputX + nMargin * 4 + nInputWidth, nEndY + 5, nLabelWidth / 3, nLabelHeight, SWP_NOZORDER | SWP_NOACTIVATE);
 	GetDlgItem(IDC_EDIT_Y2)->  SetWindowPos(NULL, nInputX + nMargin * 4 + nInputWidth + nMargin * 2.5, nEndY, nInputWidth, nLabelHeight, SWP_NOZORDER | SWP_NOACTIVATE);
 
-	GetDlgItem(IDC_BTN_ACTION)->SetWindowPos(NULL, nDlgWidth * 0.7, nEndY - (nButtonHeight / 4), nButtonWidth, nButtonHeight, SWP_NOZORDER | SWP_NOACTIVATE);
+	GetDlgItem(IDC_BTN_ACTION)->SetWindowPos(NULL, nDlgWidth * 0.7, nEndY - (nButtonHeight / 6), nButtonWidth, nButtonHeight, SWP_NOZORDER | SWP_NOACTIVATE);
 
 	// location of static, edit box, buttons (open, close)
 	int nBottomY = nDlgHeight * 0.89;
@@ -527,4 +528,14 @@ void CGrimTaskDlg::OnBnClickedBtnOpen()
 
 		Invalidate(FALSE);
 	}
+}
+
+
+void CGrimTaskDlg::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+
+	CDialogEx::OnGetMinMaxInfo(lpMMI);
+	lpMMI->ptMinTrackSize.x = 1000;
+	lpMMI->ptMinTrackSize.y = 1024;
 }
