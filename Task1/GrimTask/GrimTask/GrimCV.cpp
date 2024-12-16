@@ -79,23 +79,10 @@ BOOL C_GrimCV::Action(unsigned char* pucImg, int nPitch, int nImageWidth, int nI
         }
     }
 
-    //if (!bMoveX)    AfxMessageBox(_T("범위를 초과하였거나 목표 X 좌표에 도달하였습니다"));
-    //if (!bMoveY)    AfxMessageBox(_T("범위를 초과하였거나 목표 Y 좌표에 도달하였습니다"));
-
     if(!bMoveX && !bMoveY)
         return FALSE;
 
     return TRUE;
-}
-
-BOOL C_GrimCV::OpenImage()
-{
-	return 0;
-}
-
-BOOL C_GrimCV::DetectCircle()
-{
-	return 0;
 }
 
 BOOL C_GrimCV::ShiftImageUp()

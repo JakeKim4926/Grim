@@ -34,8 +34,6 @@ public:
 
 	BOOL DrawCircle(unsigned char* pucImg, int nPitch, int nImageWidth, int nImageHeight);
 	BOOL Action(unsigned char* pucImg, int nPitch, int nImageWidth, int nImageHeight);
-	BOOL OpenImage();
-	BOOL DetectCircle();
 
 	BOOL ShiftImageUp();
 	BOOL ShiftImageDown(int nHeight);
