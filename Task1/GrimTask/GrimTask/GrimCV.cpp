@@ -52,8 +52,8 @@ BOOL C_GrimCV::Action(unsigned char* pucImg, int nPitch, int nImageWidth, int nI
     if (m_sCoordinate.m_nX1 == m_sCoordinate.m_nX2)   bXEqual = true;
     if (m_sCoordinate.m_nY1 == m_sCoordinate.m_nY2)   bYEqual = true;
     
-    BOOL bMoveX = TRUE;
-    BOOL bMoveY = TRUE;
+    BOOL bMoveX = FALSE;
+    BOOL bMoveY = FALSE;
 
     if (!bXEqual) {
         if (!bRight)  bMoveX = ShiftImageLeft();
