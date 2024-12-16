@@ -48,7 +48,87 @@ END_MESSAGE_MAP()
 
 // CGrimTaskDlg 대화 상자
 
+UINT ThreadAction(LPVOID pParam)
+{
+	CGrimTaskDlg* pDlg = (CGrimTaskDlg*)pParam;
+	if (pDlg == NULL) {
+		return 0;
+	}
 
+	CString strX2, strY2;
+	pDlg->GetDlgItem(IDC_EDIT_X2)->GetWindowText(strX2);
+	pDlg->GetDlgItem(IDC_EDIT_Y2)->GetWindowText(strY2);
+
+	int nX1 = pDlg->getGrimCV()->getCoordinate().m_nX1;
+	int nY1 = pDlg->getGrimCV()->getCoordinate().m_nY1;
+	int nX2 = _ttoi(strX2);
+	int nY2 = _ttoi(strY2);
+
+	if (nX1 <= 0 || nY1 <= 0 || nX2 <= 0 || nY2 <= 0 ||
+		nX1 >= pDlg->getImageWidth() || nY1 >= pDlg->getImageHeight() ||
+		nX2 >= pDlg->getImageWidth() || nY2 >= pDlg->getImageHeight()) {
+
+		CString strSize;
+		strSize.Format(_T("%d,%d"), pDlg->getImageWidth(), pDlg->getImageHeight());
+		AfxMessageBox(_T("원이 그려진 상태가 아니거나 , 범위 값 : ") + strSize + _T("을 벗어난 값이 입력되었습니다."));
+		return 0;
+	}
+	else if (nX1 == nX2 && nY1 == nY2) {
+		AfxMessageBox(_T("두 좌표의 값이 같습니다."));
+		return 0;
+	}
+
+	// draw
+	pDlg->getGrimCV()->setCoordinate(nX1, nY1, nX2, nY2);
+
+	int nPitch = pDlg->getImage().GetPitch();
+	unsigned char* fm = (unsigned char*)pDlg->getImage().GetBits();
+
+	BOOL bAction = pDlg->getGrimCV()->Action(fm, nPitch, pDlg->getImageWidth(), pDlg->getImageHeight());
+
+	CString strX1, strY1;
+	strX1.Format(_T("%d"), pDlg->getGrimCV()->getCoordinate().m_nX1);
+	strY1.Format(_T("%d"), pDlg->getGrimCV()->getCoordinate().m_nY1);
+
+	pDlg->GetDlgItem(IDC_EDIT_X1)->SetWindowText(strX1);
+	pDlg->GetDlgItem(IDC_EDIT_Y1)->SetWindowText(strY1);
+
+	// save
+	if (bAction) {
+		TCHAR chPath[256] = { 0, };
+		GetModuleFileName(NULL, chPath, 256);
+
+		CString folderPath(chPath);
+		folderPath = folderPath.Left(folderPath.ReverseFind('\\')) + _T("/image");
+
+		if (GetFileAttributes(folderPath) == INVALID_FILE_ATTRIBUTES) {
+			if (!CreateDirectory(folderPath, NULL)) {
+				AfxMessageBox(_T("폴더 생성 실패!"));
+				return 0;
+			}
+		}
+
+		SYSTEMTIME sysTime;
+		GetLocalTime(&sysTime);
+
+		CString strFileName;
+		strFileName.Format(folderPath + _T("/image_%04d%02d%02d_%02d%02d%02d_%03d.bmp"),
+			sysTime.wYear,
+			sysTime.wMonth,
+			sysTime.wDay,
+			sysTime.wHour,
+			sysTime.wMinute,
+			sysTime.wSecond,
+			sysTime.wMilliseconds);
+
+		pDlg->getImage().Save(strFileName);
+	}
+
+	// 이미지 갱신 요청
+	pDlg->Invalidate(FALSE);
+
+	return 0;
+}
 
 CGrimTaskDlg::CGrimTaskDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_GRIMTASK_DIALOG, pParent)
@@ -271,6 +351,26 @@ void CGrimTaskDlg::OnSize(UINT nType, int cx, int cy)
 	}
 }
 
+C_GrimCV* CGrimTaskDlg::getGrimCV()
+{
+	return m_grimCV;
+}
+
+int CGrimTaskDlg::getImageWidth()
+{
+	return m_nImageWidth;
+}
+
+int CGrimTaskDlg::getImageHeight()
+{
+	return m_nImageHeight;
+}
+
+CImage& CGrimTaskDlg::getImage()
+{
+	return m_image;
+}
+
 void CGrimTaskDlg::OnBnClickedBtnDraw()
 {
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
@@ -331,84 +431,5 @@ void CGrimTaskDlg::OnDestroy()
 
 void CGrimTaskDlg::OnBnClickedBtnAction()
 {
-	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
-	CString strX2;
-	CString strY2;
-
-	int nX1 = 0;
-	int nY1 = 0;
-	int nX2 = 0;
-	int nY2 = 0;
-
-	GetDlgItem(IDC_EDIT_X2)->GetWindowText(strX2);
-	GetDlgItem(IDC_EDIT_Y2)->GetWindowText(strY2);
-
-	nX1 = m_grimCV->getCoordinate().m_nX1;
-	nY1 = m_grimCV->getCoordinate().m_nY1;
-	nX2 = _ttoi(strX2);
-	nY2 = _ttoi(strY2);
-
-	if (nX1  <= 0 || nY1 <= 0 || nX2 <= 0 || nY2 <= 0 ||
-		nX1 >= m_nImageWidth || nY1 >= m_nImageHeight || nX2 >= m_nImageWidth || nY2 >= m_nImageHeight) {
-
-		CString strSize;
-		strSize.Format(_T("%d,%d"), m_nImageWidth, m_nImageHeight);
-
-		AfxMessageBox(_T("원이 그려진 상태가 아니거나 , 범위 값 : ") + strSize + _T("을 벗어난 값이 입력되었습니다."));
-		
-		return;
-	} else if (nX1 == nX2 && nY1 == nY2) {
-		
-		AfxMessageBox(_T("두 좌표의 값이 같습니다."));
-		return;
-	}
-
-	// draw
-	m_grimCV->setCoordinate(nX1, nY1, nX2, nY2);
-
-	int nPitch = m_image.GetPitch();
-	unsigned char* fm = (unsigned char*)m_image.GetBits();
-
-	BOOL bAction = m_grimCV->Action(fm, nPitch, m_nImageWidth, m_nImageHeight);
-
-	CString strX1;
-	CString strY1;
-	strX1.Format(_T("%d"), m_grimCV->getCoordinate().m_nX1);
-	strY1.Format(_T("%d"), m_grimCV->getCoordinate().m_nY1);
-
-	GetDlgItem(IDC_EDIT_X1)->SetWindowText(strX1);
-	GetDlgItem(IDC_EDIT_Y1)->SetWindowText(strY1);
-
-	// save
-	if (bAction) {
-		TCHAR chPath[256] = { 0, };
-		GetModuleFileName(NULL, chPath, 256);
-
-		CString folderPath(chPath);
-		folderPath = folderPath.Left(folderPath.ReverseFind('\\')) + _T("/image");
-
-		if (GetFileAttributes(folderPath) == INVALID_FILE_ATTRIBUTES) {
-			if (!CreateDirectory(folderPath, NULL)) {
-				AfxMessageBox(_T("폴더 생성 실패!"));
-				return;
-			}
-		}
-
-		SYSTEMTIME sysTime;
-		GetLocalTime(&sysTime);
-
-		CString strFileName;
-		strFileName.Format(folderPath + _T("/image_%04d%02d%02d_%02d%02d%02d_%03d.bmp"),
-			sysTime.wYear,
-			sysTime.wMonth,
-			sysTime.wDay,
-			sysTime.wHour,
-			sysTime.wMinute,
-			sysTime.wSecond,
-			sysTime.wMilliseconds);
-
-		m_image.Save(strFileName);
-	}
-
-	Invalidate(FALSE);
+	AfxBeginThread(ThreadAction, this);
 }

@@ -49,8 +49,16 @@ private:
 
 	int m_nImageWidth;
 	int m_nImageHeight;
+public:
+	C_GrimCV* getGrimCV();
+
+	int getImageWidth();
+	int getImageHeight();
+
+	CImage& getImage();
 ;	
 public:
+	LRESULT OnUpdateUI(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnBnClickedBtnDraw();
 	afx_msg void OnDestroy();
 	afx_msg void OnBnClickedBtnAction();
