@@ -149,6 +149,7 @@ BEGIN_MESSAGE_MAP(CGrimTaskDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BTN_DRAW, &CGrimTaskDlg::OnBnClickedBtnDraw)
 	ON_WM_DESTROY()
 	ON_BN_CLICKED(IDC_BTN_ACTION, &CGrimTaskDlg::OnBnClickedBtnAction)
+	ON_BN_CLICKED(IDC_BTN_OPEN, &CGrimTaskDlg::OnBnClickedBtnOpen)
 END_MESSAGE_MAP()
 
 
@@ -319,7 +320,7 @@ void CGrimTaskDlg::OnSize(UINT nType, int cx, int cy)
 	GetDlgItem(IDC_BTN_ACTION)->MoveWindow(nEndX, nEndY, nButtonWidth, nButtonHeight);
 
 	// Bottom Line
-	GetDlgItem(IDC_BTN_LOAD_IMG)->MoveWindow(cx / 2 - nButtonWidth - nMargin, cy - nButtonHeight - nMargin, nButtonWidth, nButtonHeight);
+	GetDlgItem(IDC_BTN_OPEN)->MoveWindow(cx / 2 - nButtonWidth - nMargin, cy - nButtonHeight - nMargin, nButtonWidth, nButtonHeight);
 	GetDlgItem(IDC_BTN_CLOSE)->MoveWindow(cx / 2 + nMargin, cy - nButtonHeight - nMargin, nButtonWidth, nButtonHeight);
 
 	// Image
@@ -432,4 +433,87 @@ void CGrimTaskDlg::OnDestroy()
 void CGrimTaskDlg::OnBnClickedBtnAction()
 {
 	AfxBeginThread(ThreadAction, this);
+}
+
+void CGrimTaskDlg::OnBnClickedBtnOpen()
+{
+	// 파일 열기 대화상자
+	CFileDialog dlg(TRUE, _T("bmp"), NULL, OFN_FILEMUSTEXIST | OFN_HIDEREADONLY,
+		_T("Bitmap Files (*.bmp)|*.bmp|All Files (*.*)|*.*||"), this);
+
+	if (dlg.DoModal() == IDOK)
+	{
+		CString strPath = dlg.GetPathName();
+
+		if (!m_image.IsNull()) {
+			m_image.Destroy();
+		}
+
+		HRESULT hr = m_image.Load(strPath);
+		if (FAILED(hr)){
+			AfxMessageBox(_T("이미지 로드 실패!"));
+			return;
+		}
+
+		m_nImageWidth = m_image.GetWidth();
+		m_nImageHeight = m_image.GetHeight();
+		int nPitch = m_image.GetPitch();
+		unsigned char* fm = (unsigned char*)m_image.GetBits();
+
+		int nMinX = m_nImageWidth, nMaxX = -1;
+		int nMinY = m_nImageHeight, nMaxY = -1;
+
+		for (int y = 0; y < m_nImageHeight; y++) {
+			for (int x = 0; x < m_nImageWidth; x++) {
+				unsigned char val = fm[y * nPitch + x];
+				if (val == COLOR_WHITE) {
+					if (x < nMinX) nMinX = x;
+					if (x > nMaxX) nMaxX = x;
+					if (y < nMinY) nMinY = y;
+					if (y > nMaxY) nMaxY = y;
+				}
+			}
+		}
+
+		if (nMaxX < 0 || nMaxY < 0) {
+			AfxMessageBox(_T("흰색 픽셀(원)을 찾을 수 없습니다."));
+			Invalidate(FALSE);
+			return;
+		}
+
+		int nCenterX = (nMinX + nMaxX) / 2;
+		int nCenterY = (nMinY + nMaxY) / 2;
+
+		// 'X' 표시 그리기
+		for (int i = -5; i <= 5; i++) {
+			int x = nCenterX + i;
+			int y = nCenterY + i;
+			if (x >= 0 && x < m_nImageWidth && y >= 0 && y < m_nImageHeight) {
+				fm[y * nPitch + x] = 0;
+			}
+		}
+
+		for (int i = -5; i <= 5; i++) {
+			int x = nCenterX + i;
+			int y = nCenterY - i;
+			if (x >= 0 && x < m_nImageWidth && y >= 0 && y < m_nImageHeight) {
+				fm[y * nPitch + x] = 0;
+			}
+		}
+
+		// 중심 좌표값 표시
+		CString strCoord;
+		strCoord.Format(_T("(%d, %d)"), nCenterX, nCenterY);
+
+		HDC hdc = m_image.GetDC();
+		if (hdc) {
+			SetBkMode(hdc, TRANSPARENT);
+			SetTextColor(hdc, RGB(0, 0, 0));
+
+			TextOut(hdc, nCenterX - 35, nCenterY - 30, strCoord, strCoord.GetLength());
+			m_image.ReleaseDC();
+		}
+
+		Invalidate(FALSE);
+	}
 }

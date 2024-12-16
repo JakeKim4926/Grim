@@ -9,7 +9,7 @@
 #define IDR_MAINFRAME                   128
 #define IDC_BTN_DRAW                    2000
 #define IDC_BTN_ACTION                  2001
-#define IDC_BTN_LOAD_IMG                2002
+#define IDC_BTN_OPEN                    2002
 #define IDC_BTN_CLOSE                   2003
 #define IDC_EDIT_X1                     2004
 #define IDC_EDIT_Y1                     2005

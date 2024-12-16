@@ -62,4 +62,5 @@ public:
 	afx_msg void OnBnClickedBtnDraw();
 	afx_msg void OnDestroy();
 	afx_msg void OnBnClickedBtnAction();
+	afx_msg void OnBnClickedBtnOpen();
 };
