@@ -151,6 +151,8 @@ BEGIN_MESSAGE_MAP(CGrimTaskDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BTN_ACTION, &CGrimTaskDlg::OnBnClickedBtnAction)
 	ON_BN_CLICKED(IDC_BTN_OPEN, &CGrimTaskDlg::OnBnClickedBtnOpen)
 	ON_WM_GETMINMAXINFO()
+	ON_BN_CLICKED(IDC_BTN_CLOSE, &CGrimTaskDlg::OnBnClickedBtnClose)
+	ON_WM_CLOSE()
 END_MESSAGE_MAP()
 
 
@@ -404,7 +406,7 @@ void CGrimTaskDlg::OnBnClickedBtnDraw()
 		CString strSize;
 		strSize.Format(_T("%d,%d"), m_nImageWidth, m_nImageHeight);
 
-		AfxMessageBox(_T("값이 0이하이거나 범위 값 : ") + strSize + _T("을 벗어난 값이 입력되었습니다."));
+		AfxMessageBox(_T("값이 0이하이거나 범위 값 : (") + strSize + _T(")을 벗어난 값이 입력되었습니다."));
 		return;
 	}
 
@@ -538,4 +540,26 @@ void CGrimTaskDlg::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 	CDialogEx::OnGetMinMaxInfo(lpMMI);
 	lpMMI->ptMinTrackSize.x = 1000;
 	lpMMI->ptMinTrackSize.y = 1024;
+}
+
+
+void CGrimTaskDlg::OnBnClickedBtnClose()
+{
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	PostMessage(WM_CLOSE);
+}
+
+
+void CGrimTaskDlg::OnClose()
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	int nRet = AfxMessageBox(_T("프로그램을 종료하시겠습니까?"), MB_YESNO | MB_ICONQUESTION);
+	if (nRet == IDYES) {
+		CDialogEx::OnClose();
+	}
+	else {
+		return;
+	}
+
+	CDialogEx::OnClose();
 }

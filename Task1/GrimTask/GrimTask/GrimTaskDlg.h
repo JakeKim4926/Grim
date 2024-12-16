@@ -64,4 +64,6 @@ public:
 	afx_msg void OnBnClickedBtnAction();
 	afx_msg void OnBnClickedBtnOpen();
 	afx_msg void OnGetMinMaxInfo(MINMAXINFO* lpMMI);
+	afx_msg void OnBnClickedBtnClose();
+	afx_msg void OnClose();
 };
