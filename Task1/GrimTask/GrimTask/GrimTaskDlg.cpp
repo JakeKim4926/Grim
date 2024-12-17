@@ -279,7 +279,7 @@ void CGrimTaskDlg::OnSize(UINT nType, int cx, int cy)
 	int nButtonWidth = nDlgWidth / 8;
 	int nButtonHeight = nDlgHeight / 20;
 	int nInputWidth = nDlgWidth / 10;
-	int nLabelHeight = nDlgHeight / 25;
+	int nLabelHeight = nDlgHeight / 30 + 5;
 	int nLabelWidth = nDlgWidth / 12;
 
 	// location of title
