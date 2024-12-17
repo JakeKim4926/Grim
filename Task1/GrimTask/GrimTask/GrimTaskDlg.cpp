@@ -279,7 +279,7 @@ void CGrimTaskDlg::OnSize(UINT nType, int cx, int cy)
 	int nButtonWidth = nDlgWidth / 8;
 	int nButtonHeight = nDlgHeight / 20;
 	int nInputWidth = nDlgWidth / 10;
-	int nLabelHeight = nDlgHeight / 30;
+	int nLabelHeight = nDlgHeight / 30 + 5;
 	int nLabelWidth = nDlgWidth / 12;
 
 	// location of title
@@ -414,7 +414,7 @@ void CGrimTaskDlg::OnBnClickedBtnDraw()
 	}
 
 	
-	Invalidate(FALSE);
+	Invalidate(TRUE);
 }
 
 
@@ -448,23 +448,62 @@ void CGrimTaskDlg::OnBnClickedBtnOpen()
 		}
 
 		HRESULT hr = m_image.Load(strPath);
-		if (FAILED(hr)){
+		if (FAILED(hr)) {
 			AfxMessageBox(_T("이미지 로드 실패!"));
 			return;
 		}
 
-		m_nImageWidth = m_image.GetWidth();
-		m_nImageHeight = m_image.GetHeight();
-		int nPitch = m_image.GetPitch();
-		unsigned char* fm = (unsigned char*)m_image.GetBits();
+		CImage resizedImage;
+		resizedImage.Create(m_nImageWidth, m_nImageHeight, 32);
 
-		int nMinX = m_nImageWidth, nMaxX = -1;
-		int nMinY = m_nImageHeight, nMaxY = -1;
+		HDC hdcSrc = m_image.GetDC();
+		HDC hdcDest = resizedImage.GetDC();
+
+		if (hdcSrc && hdcDest) {
+			SetStretchBltMode(hdcDest, HALFTONE);
+			StretchBlt(hdcDest, 0, 0, m_nImageWidth, m_nImageHeight,
+				hdcSrc, 0, 0, m_image.GetWidth(), m_image.GetHeight(), SRCCOPY);
+		}
+		resizedImage.ReleaseDC();
+		m_image.ReleaseDC();
+
+		m_image.Destroy();
+		m_image.Attach(resizedImage.Detach());
+
+		// grayscale
+		CImage grayImage;
+		grayImage.Create(m_nImageWidth, m_nImageHeight, 8);
+
+		static RGBQUAD rgb[256];
+		for (int i = 0; i < 256; i++) {
+			rgb[i].rgbRed = rgb[i].rgbGreen = rgb[i].rgbBlue = i;
+		}
+		grayImage.SetColorTable(0, 256, rgb);
+
+		int nPitch = m_image.GetPitch();
+		unsigned char* fmSrc = (unsigned char*)m_image.GetBits();
+		unsigned char* fmDest = (unsigned char*)grayImage.GetBits();
+		int nGrayPitch = grayImage.GetPitch();
 
 		for (int y = 0; y < m_nImageHeight; y++) {
 			for (int x = 0; x < m_nImageWidth; x++) {
-				unsigned char val = fm[y * nPitch + x];
-				if (val == COLOR_WHITE) {
+				unsigned char* pPixel = fmSrc + (y * nPitch) + (x * 4);
+				unsigned char gray = (unsigned char)(0.299 * pPixel[2] + 0.587 * pPixel[1] + 0.114 * pPixel[0]);
+				fmDest[y * nGrayPitch + x] = gray;
+			}
+		}
+
+		m_image.Destroy();
+		m_image.Attach(grayImage.Detach());
+
+		// find circle
+		int nMinX = m_nImageWidth, nMaxX = -1;
+		int nMinY = m_nImageHeight, nMaxY = -1;
+
+		unsigned char* fm = (unsigned char*)m_image.GetBits();
+		for (int y = 0; y < m_nImageHeight; y++) {
+			for (int x = 0; x < m_nImageWidth; x++) {
+				if (fm[y * nGrayPitch + x] >= 200) {
 					if (x < nMinX) nMinX = x;
 					if (x > nMaxX) nMaxX = x;
 					if (y < nMinY) nMinY = y;
@@ -482,12 +521,12 @@ void CGrimTaskDlg::OnBnClickedBtnOpen()
 		int nCenterX = (nMinX + nMaxX) / 2;
 		int nCenterY = (nMinY + nMaxY) / 2;
 
-		// 'X' 표시 그리기
+		// Draw 'X'
 		for (int i = -5; i <= 5; i++) {
 			int x = nCenterX + i;
 			int y = nCenterY + i;
 			if (x >= 0 && x < m_nImageWidth && y >= 0 && y < m_nImageHeight) {
-				fm[y * nPitch + x] = 0;
+				fm[y * nGrayPitch + x] = COLOR_BLACK;
 			}
 		}
 
@@ -495,7 +534,7 @@ void CGrimTaskDlg::OnBnClickedBtnOpen()
 			int x = nCenterX + i;
 			int y = nCenterY - i;
 			if (x >= 0 && x < m_nImageWidth && y >= 0 && y < m_nImageHeight) {
-				fm[y * nPitch + x] = 0;
+				fm[y * nGrayPitch + x] = COLOR_BLACK;
 			}
 		}
 
@@ -512,14 +551,10 @@ void CGrimTaskDlg::OnBnClickedBtnOpen()
 			m_image.ReleaseDC();
 		}
 
-		GetDlgItem(IDC_EDIT_X1)->SetWindowText(_T("0"));
-		GetDlgItem(IDC_EDIT_Y1)->SetWindowText(_T("0"));
-
-		m_grimCV->getCoordinate().setCoordinate1(0,0);
-
-		Invalidate(FALSE);
+		Invalidate(TRUE);
 	}
 }
+
 
 
 void CGrimTaskDlg::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
