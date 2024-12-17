@@ -512,6 +512,11 @@ void CGrimTaskDlg::OnBnClickedBtnOpen()
 			m_image.ReleaseDC();
 		}
 
+		GetDlgItem(IDC_EDIT_X1)->SetWindowText(_T("0"));
+		GetDlgItem(IDC_EDIT_Y1)->SetWindowText(_T("0"));
+
+		m_grimCV->getCoordinate().setCoordinate1(0,0);
+
 		Invalidate(FALSE);
 	}
 }
